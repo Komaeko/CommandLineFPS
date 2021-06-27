@@ -1,0 +1,4 @@
+﻿  CommandLineFPS.cpp
+C:\Users\Alpha\source\repos\CommandLineFPS\CommandLineFPS.cpp(301,17): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Users\Alpha\source\repos\CommandLineFPS\CommandLineFPS.cpp(380,44): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+  CommandLineFPS.vcxproj -> C:\Users\Alpha\source\repos\CommandLineFPS\Debug\CommandLineFPS.exe

@@ -1,143 +1,155 @@
 /*
-	OneLoneCoder.com - Command Line First Person Shooter (FPS) Engine
-	"Why were games not done like this is 1990?" - @Javidx9
-
+	OneLoneCoder.com - Upgraded Command Line First Person Shooter (FPS) Engine
+	"Bricks and Lamps people, bricks and lamps..." - @Javidx9
 	License
 	~~~~~~~
-	Copyright (C) 2018  Javidx9
+	One Lone Coder Console Game Engine  Copyright (C) 2018  Javidx9
 	This program comes with ABSOLUTELY NO WARRANTY.
 	This is free software, and you are welcome to redistribute it
-	under certain conditions; See license for details. 
+	under certain conditions; See license for details.
 	Original works located at:
 	https://www.github.com/onelonecoder
 	https://www.onelonecoder.com
 	https://www.youtube.com/javidx9
-
 	GNU GPLv3
 	https://github.com/OneLoneCoder/videos/blob/master/LICENSE
-
 	From Javidx9 :)
 	~~~~~~~~~~~~~~~
-	Hello! Ultimately I don't care what you use this for. It's intended to be 
-	educational, and perhaps to the oddly minded - a little bit of fun. 
-	Please hack this, change it and use it in any way you see fit. You acknowledge 
-	that I am not responsible for anything bad that happens as a result of 
+	Hello! Ultimately I don't care what you use this for. It's intended to be
+	educational, and perhaps to the oddly minded - a little bit of fun.
+	Please hack this, change it and use it in any way you see fit. You acknowledge
+	that I am not responsible for anything bad that happens as a result of
 	your actions. However this code is protected by GNU GPLv3, see the license in the
 	github repo. This means you must attribute me if you use it. You can view this
 	license here: https://github.com/OneLoneCoder/videos/blob/master/LICENSE
 	Cheers!
-
 	Background
 	~~~~~~~~~~
-	Whilst waiting for TheMexicanRunner to start the finale of his NesMania project,
-	his Twitch stream had a counter counting down for a couple of hours until it started.
-	With some time on my hands, I thought it might be fun to see what the graphical
-	capabilities of the console are. Turns out, not very much, but hey, it's nice to think
-	Wolfenstein could have existed a few years earlier, and in just ~200 lines of code.
+	The FPS video was one of my first youtube videos, and I feel one of my better
+	ones, but its not had the popularity it deserves. So I'm upgrading the engine
+	to make it more appealling.
 
-	IMPORTANT!!!!
-	~~~~~~~~~~~~~
-	READ ME BEFORE RUNNING!!! This program expects the console dimensions to be set to 
-	120 Columns by 40 Rows. I recommend a small font "Consolas" at size 16. You can do this
-	by running the program, and right clicking on the console title bar, and specifying 
-	the properties. You can also choose to default to them in the future.
-	
-	Controls: A = Turn Left, D = Turn Right, W = Walk Forwards, S = Walk Backwards
-
-	Future Modifications
-	~~~~~~~~~~~~~~~~~~~~
-	1) Shade block segments based on angle from player, i.e. less light reflected off
-	walls at side of player. Walls straight on are brightest.
-	2) Find an interesting and optimised ray-tracing method. I'm sure one must exist
-	to more optimally search the map space
-	3) Add bullets!
-	4) Add bad guys!
-
+	IMPORTANT!!
+	~~~~~~~~~~~
+	You'll need the FPSSprites folder too!
 	Author
 	~~~~~~
 	Twitter: @javidx9
 	Blog: www.onelonecoder.com
-
 	Video:
-	~~~~~~	
-	https://youtu.be/xW8skO7MFYw
-
-	Last Updated: 27/02/2017
+	~~~~~~
+	https://youtu.be/HEb2akswCcw
+	Last Updated: 23/10/2017
 */
 
 #include <iostream>
-#include <vector>
-#include <utility>
+#include <string>
 #include <algorithm>
-#include <chrono>
 using namespace std;
 
-#include <stdio.h>
-#include <Windows.h>
+#include "olcConsoleGameEngine.h"
 
-int nScreenWidth = 120;			// Console Screen Size X (columns)
-int nScreenHeight = 40;			// Console Screen Size Y (rows)
-int nMapWidth = 16;				// World Dimensions
-int nMapHeight = 16;
-
-float fPlayerX = 14.7f;			// Player Start Position
-float fPlayerY = 5.09f;
-float fPlayerA = 0.0f;			// Player Start Rotation
-float fFOV = 3.14159f / 4.0f;	// Field of View
-float fDepth = 16.0f;			// Maximum rendering distance
-float fSpeed = 5.0f;			// Walking Speed
-
-int main()
+class OneLoneCoder_UltimateFPS : public olcConsoleGameEngine
 {
-	// Create Screen Buffer
-	wchar_t *screen = new wchar_t[nScreenWidth*nScreenHeight];
-	HANDLE hConsole = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
-	SetConsoleActiveScreenBuffer(hConsole);
-	DWORD dwBytesWritten = 0;
-
-	// Create Map of world space # = wall block, . = space
-	wstring map;
-	map += L"#########.......";
-	map += L"#...............";
-	map += L"#.......########";
-	map += L"#..............#";
-	map += L"#......##......#";
-	map += L"#......##......#";
-	map += L"#..............#";
-	map += L"###............#";
-	map += L"##.............#";
-	map += L"#......####..###";
-	map += L"#......#.......#";
-	map += L"#......#.......#";
-	map += L"#..............#";
-	map += L"#......#########";
-	map += L"#..............#";
-	map += L"################";
-
-	auto tp1 = chrono::system_clock::now();
-	auto tp2 = chrono::system_clock::now();
-	
-	while (1)
+public:
+	OneLoneCoder_UltimateFPS()
 	{
-		// We'll need time differential per frame to calculate modification
-		// to movement speeds, to ensure consistant movement, as ray-tracing
-		// is non-deterministic
-		tp2 = chrono::system_clock::now();
-		chrono::duration<float> elapsedTime = tp2 - tp1;
-		tp1 = tp2;
-		float fElapsedTime = elapsedTime.count();
+		m_sAppName = L"Ultimate First Person Shooter";
+	}
+
+private:
+	int nMapWidth = 32;				// World Dimensions
+	int nMapHeight = 32;
+
+	float fPlayerX = 14.7f;			// Player Start Position
+	float fPlayerY = 8;// 5.09f;
+	float fPlayerA = -3.14159f / 2.0f;			// Player Start Rotation
+	float fFOV = 3.14159f / 4.0f;	// Field of View
+	float fDepth = 16.0f;			// Maximum rendering distance
+	float fSpeed = 5.0f;			// Walking Speed
+	wstring map;
+
+	olcSprite* spriteWall;
+	olcSprite* spriteLamp;
+	olcSprite* spriteFireBall;
+
+	float* fDepthBuffer = nullptr;
+
+	struct sObject
+	{
+		float x;
+		float y;
+		float vx;
+		float vy;
+		bool bRemove;
+		olcSprite* sprite;
+	};
+
+	list<sObject> listObjects;
+
+protected:
+	virtual bool OnUserCreate()
+	{
+		map += L"#########.......#########.......";
+		map += L"#...............#...............";
+		map += L"#.......#########.......########";
+		map += L"#..............##..............#";
+		map += L"#......##......##......##......#";
+		map += L"#......##..............##......#";
+		map += L"#..............##..............#";
+		map += L"###............####............#";
+		map += L"##.............###.............#";
+		map += L"#............####............###";
+		map += L"#..............................#";
+		map += L"#..............##..............#";
+		map += L"#..............##..............#";
+		map += L"#...........#####...........####";
+		map += L"#..............................#";
+		map += L"###..####....########....#######";
+		map += L"####.####.......######..........";
+		map += L"#...............#...............";
+		map += L"#.......#########.......##..####";
+		map += L"#..............##..............#";
+		map += L"#......##......##.......#......#";
+		map += L"#......##......##......##......#";
+		map += L"#..............##..............#";
+		map += L"###............####............#";
+		map += L"##.............###.............#";
+		map += L"#............####............###";
+		map += L"#..............................#";
+		map += L"#..............................#";
+		map += L"#..............##..............#";
+		map += L"#...........##..............####";
+		map += L"#..............##..............#";
+		map += L"################################";
 
 
+		spriteWall = new olcSprite(L"FPSSprites/fps_wall1.spr");
+		spriteLamp = new olcSprite(L"FPSSprites/fps_lamp1.spr");
+		spriteFireBall = new olcSprite(L"FPSSprites/fps_fireball1.spr");
+		fDepthBuffer = new float[ScreenWidth()];
+
+		listObjects = {
+			{ 8.5f, 8.5f, 0.0f, 0.0f, false, spriteLamp },
+			{ 7.5f, 7.5f, 0.0f, 0.0f, false, spriteLamp },
+			{ 10.5f, 3.5f, 0.0f, 0.0f, false, spriteLamp },
+		};
+		return true;
+	}
+
+
+	virtual bool OnUserUpdate(float fElapsedTime)
+	{
 		// Handle CCW Rotation
-		if (GetAsyncKeyState((unsigned short)'A') & 0x8000)
-			fPlayerA -= (fSpeed * 0.75f) * fElapsedTime;
+		if (m_keys[VK_LEFT].bHeld)
+			fPlayerA -= (fSpeed * 0.5f) * fElapsedTime;
 
 		// Handle CW Rotation
-		if (GetAsyncKeyState((unsigned short)'D') & 0x8000)
-			fPlayerA += (fSpeed * 0.75f) * fElapsedTime;
-		
+		if (m_keys[VK_RIGHT].bHeld)
+			fPlayerA += (fSpeed * 0.5f) * fElapsedTime;
+
 		// Handle Forwards movement & collision
-		if (GetAsyncKeyState((unsigned short)'W') & 0x8000)
+		if (m_keys[L'W'].bHeld)
 		{
 			fPlayerX += sinf(fPlayerA) * fSpeed * fElapsedTime;;
 			fPlayerY += cosf(fPlayerA) * fSpeed * fElapsedTime;;
@@ -145,11 +157,23 @@ int main()
 			{
 				fPlayerX -= sinf(fPlayerA) * fSpeed * fElapsedTime;;
 				fPlayerY -= cosf(fPlayerA) * fSpeed * fElapsedTime;;
-			}			
+			}
+		}
+
+		// Handle Forwards movement & collision
+		if (m_keys[VK_UP].bHeld)
+		{
+			fPlayerX += sinf(fPlayerA) * fSpeed * fElapsedTime;;
+			fPlayerY += cosf(fPlayerA) * fSpeed * fElapsedTime;;
+			if (map.c_str()[(int)fPlayerX * nMapWidth + (int)fPlayerY] == '#')
+			{
+				fPlayerX -= sinf(fPlayerA) * fSpeed * fElapsedTime;;
+				fPlayerY -= cosf(fPlayerA) * fSpeed * fElapsedTime;;
+			}
 		}
 
 		// Handle backwards movement & collision
-		if (GetAsyncKeyState((unsigned short)'S') & 0x8000)
+		if (m_keys[L'S'].bHeld)
 		{
 			fPlayerX -= sinf(fPlayerA) * fSpeed * fElapsedTime;;
 			fPlayerY -= cosf(fPlayerA) * fSpeed * fElapsedTime;;
@@ -160,13 +184,63 @@ int main()
 			}
 		}
 
-		for (int x = 0; x < nScreenWidth; x++)
+		// Handle backwards movement & collision
+		if (m_keys[VK_DOWN].bHeld)
+		{
+			fPlayerX -= sinf(fPlayerA) * fSpeed * fElapsedTime;;
+			fPlayerY -= cosf(fPlayerA) * fSpeed * fElapsedTime;;
+			if (map.c_str()[(int)fPlayerX * nMapWidth + (int)fPlayerY] == '#')
+			{
+				fPlayerX += sinf(fPlayerA) * fSpeed * fElapsedTime;;
+				fPlayerY += cosf(fPlayerA) * fSpeed * fElapsedTime;;
+			}
+		}
+
+		// Handle Strafe Right movement & collision
+		if (m_keys[L'D'].bHeld)
+		{
+			fPlayerX += cosf(fPlayerA) * fSpeed * fElapsedTime;
+			fPlayerY -= sinf(fPlayerA) * fSpeed * fElapsedTime;
+			if (map.c_str()[(int)fPlayerX * nMapWidth + (int)fPlayerY] == '#')
+			{
+				fPlayerX -= cosf(fPlayerA) * fSpeed * fElapsedTime;
+				fPlayerY += sinf(fPlayerA) * fSpeed * fElapsedTime;
+			}
+		}
+
+		// Handle Strafe Left movement & collision
+		if (m_keys[L'A'].bHeld)
+		{
+			fPlayerX -= cosf(fPlayerA) * fSpeed * fElapsedTime;
+			fPlayerY += sinf(fPlayerA) * fSpeed * fElapsedTime;
+			if (map.c_str()[(int)fPlayerX * nMapWidth + (int)fPlayerY] == '#')
+			{
+				fPlayerX += cosf(fPlayerA) * fSpeed * fElapsedTime;
+				fPlayerY -= sinf(fPlayerA) * fSpeed * fElapsedTime;
+			}
+		}
+
+		// Fire Bullets
+		if (m_keys[VK_SPACE].bReleased)
+		{
+			sObject o;
+			o.x = fPlayerX;
+			o.y = fPlayerY;
+			float fNoise = (((float)rand() / (float)RAND_MAX) - 0.5f) * 0.1f;
+			o.vx = sinf(fPlayerA + fNoise) * 8.0f;
+			o.vy = cosf(fPlayerA + fNoise) * 8.0f;
+			o.sprite = spriteFireBall;
+			o.bRemove = false;
+			listObjects.push_back(o);
+		}
+
+		for (int x = 0; x < ScreenWidth(); x++)
 		{
 			// For each column, calculate the projected ray angle into world space
-			float fRayAngle = (fPlayerA - fFOV/2.0f) + ((float)x / (float)nScreenWidth) * fFOV;
+			float fRayAngle = (fPlayerA - fFOV / 2.0f) + ((float)x / (float)ScreenWidth()) * fFOV;
 
 			// Find distance to wall
-			float fStepSize = 0.1f;		  // Increment size for ray casting, decrease to increase										
+			float fStepSize = 0.01f;	  // Increment size for ray casting, decrease to increase	
 			float fDistanceToWall = 0.0f; //                                      resolution
 
 			bool bHitWall = false;		// Set when ray hits wall block
@@ -175,6 +249,10 @@ int main()
 			float fEyeX = sinf(fRayAngle); // Unit vector for ray in player space
 			float fEyeY = cosf(fRayAngle);
 
+			float fSampleX = 0.0f;
+
+			bool bLit = false;
+
 			// Incrementally cast ray from player, along ray angle, testing for 
 			// intersection with a block
 			while (!bHitWall && fDistanceToWall < fDepth)
@@ -182,7 +260,7 @@ int main()
 				fDistanceToWall += fStepSize;
 				int nTestX = (int)(fPlayerX + fEyeX * fDistanceToWall);
 				int nTestY = (int)(fPlayerY + fEyeY * fDistanceToWall);
-				
+
 				// Test if ray is out of bounds
 				if (nTestX < 0 || nTestX >= nMapWidth || nTestY < 0 || nTestY >= nMapHeight)
 				{
@@ -197,89 +275,134 @@ int main()
 						// Ray has hit wall
 						bHitWall = true;
 
-						// To highlight tile boundaries, cast a ray from each corner
-						// of the tile, to the player. The more coincident this ray
-						// is to the rendering ray, the closer we are to a tile 
-						// boundary, which we'll shade to add detail to the walls
-						vector<pair<float, float>> p;
+						// Determine where ray has hit wall. Break Block boundary
+						// int 4 line segments
+						float fBlockMidX = (float)nTestX + 0.5f;
+						float fBlockMidY = (float)nTestY + 0.5f;
 
-						// Test each corner of hit tile, storing the distance from
-						// the player, and the calculated dot product of the two rays
-						for (int tx = 0; tx < 2; tx++)
-							for (int ty = 0; ty < 2; ty++)
-							{
-								// Angle of corner to eye
-								float vy = (float)nTestY + ty - fPlayerY;
-								float vx = (float)nTestX + tx - fPlayerX;
-								float d = sqrt(vx*vx + vy*vy); 
-								float dot = (fEyeX * vx / d) + (fEyeY * vy / d);
-								p.push_back(make_pair(d, dot));
-							}
+						float fTestPointX = fPlayerX + fEyeX * fDistanceToWall;
+						float fTestPointY = fPlayerY + fEyeY * fDistanceToWall;
 
-						// Sort Pairs from closest to farthest
-						sort(p.begin(), p.end(), [](const pair<float, float> &left, const pair<float, float> &right) {return left.first < right.first; });
-						
-						// First two/three are closest (we will never see all four)
-						float fBound = 0.01;
-						if (acos(p.at(0).second) < fBound) bBoundary = true;
-						if (acos(p.at(1).second) < fBound) bBoundary = true;
-						if (acos(p.at(2).second) < fBound) bBoundary = true;
+						float fTestAngle = atan2f((fTestPointY - fBlockMidY), (fTestPointX - fBlockMidX));
+
+						if (fTestAngle >= -3.14159f * 0.25f && fTestAngle < 3.14159f * 0.25f)
+							fSampleX = fTestPointY - (float)nTestY;
+						if (fTestAngle >= 3.14159f * 0.25f && fTestAngle < 3.14159f * 0.75f)
+							fSampleX = fTestPointX - (float)nTestX;
+						if (fTestAngle < -3.14159f * 0.25f && fTestAngle >= -3.14159f * 0.75f)
+							fSampleX = fTestPointX - (float)nTestX;
+						if (fTestAngle >= 3.14159f * 0.75f || fTestAngle < -3.14159f * 0.75f)
+							fSampleX = fTestPointY - (float)nTestY;
 					}
 				}
 			}
-		
+
 			// Calculate distance to ceiling and floor
-			int nCeiling = (float)(nScreenHeight/2.0) - nScreenHeight / ((float)fDistanceToWall);
-			int nFloor = nScreenHeight - nCeiling;
+			int nCeiling = (float)(ScreenHeight() / 2.0) - ScreenHeight() / ((float)fDistanceToWall);
+			int nFloor = ScreenHeight() - nCeiling;
 
-			// Shader walls based on distance
-			short nShade = ' ';
-			if (fDistanceToWall <= fDepth / 4.0f)			nShade = 0x2588;	// Very close	
-			else if (fDistanceToWall < fDepth / 3.0f)		nShade = 0x2593;
-			else if (fDistanceToWall < fDepth / 2.0f)		nShade = 0x2592;
-			else if (fDistanceToWall < fDepth)				nShade = 0x2591;
-			else											nShade = ' ';		// Too far away
+			// Update Depth Buffer
+			fDepthBuffer[x] = fDistanceToWall;
 
-			if (bBoundary)		nShade = ' '; // Black it out
-			
-			for (int y = 0; y < nScreenHeight; y++)
+			for (int y = 0; y < ScreenHeight(); y++)
 			{
 				// Each Row
-				if(y <= nCeiling)
-					screen[y*nScreenWidth + x] = ' ';
-				else if(y > nCeiling && y <= nFloor)
-					screen[y*nScreenWidth + x] = nShade;
+				if (y <= nCeiling)
+					Draw(x, y, L' ');
+				else if (y > nCeiling && y <= nFloor)
+				{
+					// Draw Wall
+					if (fDistanceToWall < fDepth)
+					{
+						float fSampleY = ((float)y - (float)nCeiling) / ((float)nFloor - (float)nCeiling);
+						Draw(x, y, spriteWall->SampleGlyph(fSampleX, fSampleY), spriteWall->SampleColour(fSampleX, fSampleY));
+					}
+					else
+						Draw(x, y, PIXEL_SOLID, 0);
+				}
 				else // Floor
-				{				
-					// Shade floor based on distance
-					float b = 1.0f - (((float)y -nScreenHeight/2.0f) / ((float)nScreenHeight / 2.0f));
-					if (b < 0.25)		nShade = '#';
-					else if (b < 0.5)	nShade = 'x';
-					else if (b < 0.75)	nShade = '.';
-					else if (b < 0.9)	nShade = '-';
-					else				nShade = ' ';
-					screen[y*nScreenWidth + x] = nShade;
+				{
+					Draw(x, y, PIXEL_SOLID, FG_DARK_GREEN);
 				}
 			}
 		}
 
-		// Display Stats
-		swprintf_s(screen, 40, L"X=%3.2f, Y=%3.2f, A=%3.2f FPS=%3.2f ", fPlayerX, fPlayerY, fPlayerA, 1.0f/fElapsedTime);
+		// Update & Draw Objects		
+		for (auto& object : listObjects)
+		{
+			// Update Object Physics
+			object.x += object.vx * fElapsedTime;
+			object.y += object.vy * fElapsedTime;
 
-		// Display Map
+			// Check if object is inside wall - set flag for removal
+			if (map.c_str()[(int)object.x * nMapWidth + (int)object.y] == '#')
+				object.bRemove = true;
+
+			// Can object be seen?
+			float fVecX = object.x - fPlayerX;
+			float fVecY = object.y - fPlayerY;
+			float fDistanceFromPlayer = sqrtf(fVecX * fVecX + fVecY * fVecY);
+
+			float fEyeX = sinf(fPlayerA);
+			float fEyeY = cosf(fPlayerA);
+
+			// Calculate angle between lamp and players feet, and players looking direction
+			// to determine if the lamp is in the players field of view
+			float fObjectAngle = atan2f(fEyeY, fEyeX) - atan2f(fVecY, fVecX);
+			if (fObjectAngle < -3.14159f)
+				fObjectAngle += 2.0f * 3.14159f;
+			if (fObjectAngle > 3.14159f)
+				fObjectAngle -= 2.0f * 3.14159f;
+
+			bool bInPlayerFOV = fabs(fObjectAngle) < fFOV / 2.0f;
+
+			if (bInPlayerFOV && fDistanceFromPlayer >= 0.5f && fDistanceFromPlayer < fDepth && !object.bRemove)
+			{
+				float fObjectCeiling = (float)(ScreenHeight() / 2.0) - ScreenHeight() / ((float)fDistanceFromPlayer);
+				float fObjectFloor = ScreenHeight() - fObjectCeiling;
+				float fObjectHeight = fObjectFloor - fObjectCeiling;
+				float fObjectAspectRatio = (float)object.sprite->nHeight / (float)object.sprite->nWidth;
+				float fObjectWidth = fObjectHeight / fObjectAspectRatio;
+				float fMiddleOfObject = (0.5f * (fObjectAngle / (fFOV / 2.0f)) + 0.5f) * (float)ScreenWidth();
+
+				// Draw Lamp
+				for (float lx = 0; lx < fObjectWidth; lx++)
+				{
+					for (float ly = 0; ly < fObjectHeight; ly++)
+					{
+						float fSampleX = lx / fObjectWidth;
+						float fSampleY = ly / fObjectHeight;
+						wchar_t c = object.sprite->SampleGlyph(fSampleX, fSampleY);
+						int nObjectColumn = (int)(fMiddleOfObject + lx - (fObjectWidth / 2.0f));
+						if (nObjectColumn >= 0 && nObjectColumn < ScreenWidth())
+							if (c != L' ' && fDepthBuffer[nObjectColumn] >= fDistanceFromPlayer)
+							{
+								Draw(nObjectColumn, fObjectCeiling + ly, c, object.sprite->SampleColour(fSampleX, fSampleY));
+								fDepthBuffer[nObjectColumn] = fDistanceFromPlayer;
+							}
+					}
+				}
+			}
+		}
+
+		// Remove dead objects from object list
+		listObjects.remove_if([](sObject& o) {return o.bRemove; });
+
+		// Display Map & Player
 		for (int nx = 0; nx < nMapWidth; nx++)
 			for (int ny = 0; ny < nMapWidth; ny++)
-			{
-				screen[(ny+1)*nScreenWidth + nx] = map[ny * nMapWidth + nx];
-			}
-		screen[((int)fPlayerX+1) * nScreenWidth + (int)fPlayerY] = 'P';
+				Draw(nx + 1, ny + 1, map[ny * nMapWidth + nx]);
+		Draw(1 + (int)fPlayerY, 1 + (int)fPlayerX, L'P');
 
-		// Display Frame
-		screen[nScreenWidth * nScreenHeight - 1] = '\0';
-		WriteConsoleOutputCharacter(hConsole, screen, nScreenWidth * nScreenHeight, { 0,0 }, &dwBytesWritten);
+		return true;
 	}
 
+};
+
+int main()
+{
+	OneLoneCoder_UltimateFPS game;
+	game.ConstructConsole(320, 240, 4, 4);
+	game.Start();
 	return 0;
 }
-
-// That's It!! - Jx9
